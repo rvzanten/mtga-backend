@@ -1,0 +1,15 @@
+syntax="proto3";
+
+service Timestamp {
+  rpc WithWebhook (TimeStampRequest) returns (IncompleteTimeStamp){}
+}
+
+message TimeStampRequest {
+  bytes document_hash =1;
+  string webhook_url =2;
+  string email_address =3;
+}
+
+message IncompleteTimeStamp {
+  bytes ots =1;
+}
