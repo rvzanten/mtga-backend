@@ -14,7 +14,34 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/1/withcallback": {
+      "post": {
+        "operationId": "WithCallback",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/IncompleteTimeStamp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TimeStampRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Timestamp"
+        ]
+      }
+    }
+  },
   "definitions": {
     "IncompleteTimeStamp": {
       "type": "object",

@@ -44,7 +44,7 @@
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| WithWebhook | [TimeStampRequest](#TimeStampRequest) | [IncompleteTimeStamp](#IncompleteTimeStamp) |  |
+| WithCallback | [TimeStampRequest](#TimeStampRequest) | [IncompleteTimeStamp](#IncompleteTimeStamp) |  |
 
 
 
