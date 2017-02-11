@@ -64,7 +64,6 @@ func (r *Request) process() {
 		if err != nil {
 			logs.Errors.Printf("Could not read the proof file: %s, error: %s", fmt.Sprintf("%s.ots", docHex), err)
 		}
-		r.proof = proofBytes
-		r.status = STATUS_CONFIRMED
+		r.proof, r.status = proofBytes, STATUS_CONFIRMED
 	}
 }

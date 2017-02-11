@@ -9,10 +9,19 @@ import (
 
 var logs *Logger
 var cfg *Config
+var cfgMap map[string]*string
 
 func InitVars(l *Logger, c *Config) {
 	logs = l
 	cfg = c
+
+	cfgMap = map[string]*string{
+		"SMTP_HOST":     &cfg.SmtpHost,
+		"FROM_ADDR":     &cfg.FromAddr,
+		"SMTP_PASSWORD": &cfg.SmtpPassword,
+		"GRPC_BIND":     &cfg.GrpcBind,
+		"REST_BIND":     &cfg.RestBind,
+	}
 }
 
 // Config stores and reads settings
@@ -66,14 +75,6 @@ func (cfg *Config) FromFlags() {
 }
 
 func (cfg *Config) FromEnv() {
-	cfgMap := map[string]*string{
-		"SMTP_HOST":     &cfg.SmtpHost,
-		"FROM_ADDR":     &cfg.FromAddr,
-		"SMTP_PASSWORD": &cfg.SmtpPassword,
-		"GRPC_BIND":     &cfg.GrpcBind,
-		"REST_BIND":     &cfg.RestBind,
-	}
-
 	for _, e := range os.Environ() {
 		pair := strings.Split(e, "=")
 
@@ -84,22 +85,25 @@ func (cfg *Config) FromEnv() {
 		if cfgVar, exists := cfgMap[pair[0][4:]]; exists {
 			*cfgVar = pair[1]
 		} else {
-			switch pair[0] {
-			case "OTS_SMTP_PORT":
-				n, err := strconv.Atoi(pair[1])
-				if err == nil && n > 0 && n < 65536 {
-					cfg.SmtpPort = n
-				}
-				break
-			case "OTS_NOTIFIERS":
-				n, err := strconv.Atoi(pair[1])
-				if err == nil && n > 0 && n < 100 {
-					cfg.Notifiers = n
-				} else {
-					logs.Warning.Println("Invalid value for environment variable 'OTS_NOTIFIERS' (Allowed: 1-99)")
-				}
-				break
-			}
+			cfg.validateEnv(pair)
 		}
+	}
+}
+
+func (cfg *Config) validateEnv(pair []string) {
+	n, err := strconv.Atoi(pair[1])
+	switch pair[0] {
+	case "OTS_SMTP_PORT":
+		if err == nil && n > 0 && n < 65536 {
+			cfg.SmtpPort = n
+		}
+		break
+	case "OTS_NOTIFIERS":
+		if err == nil && n > 0 && n < 100 {
+			cfg.Notifiers = n
+		} else {
+			logs.Warning.Println("Invalid value for environment variable 'OTS_NOTIFIERS' (Allowed: 1-99)")
+		}
+		break
 	}
 }

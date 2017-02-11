@@ -38,9 +38,12 @@ func main() {
 	interuptChan := make(chan os.Signal)
 	signal.Notify(interuptChan, os.Interrupt)
 	s := <-interuptChan
-
-	poller.Abort = true
 	logs.Debug.Println("Got signal:", s)
+	exit(abortChan, notifyChan)
+}
+
+func exit(abortChan chan bool, notifyChan chan *types.Request) {
+	poller.Abort = true
 	logs.Debug.Println("Waiting for poller and notifiers to finish...")
 	go delayedForceExit()
 	_ = <-abortChan // abort ack from poller
