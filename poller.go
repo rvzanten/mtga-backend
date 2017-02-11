@@ -57,16 +57,18 @@ func (poller *poller) notify() {
 			txid := []byte{}
 			if req.tsRequest.EmailAddress != "" {
 				emailErr = poller._notifier.sendMail(req, txid)
+				if emailErr != nil {
+					logs.errors.Println(emailErr)
+				}
 			}
 			if req.tsRequest.WebhookUrl != "" {
 				webhookErr = poller._notifier.callWebhook(req, txid)
+				if webhookErr != nil {
+					logs.errors.Println(webhookErr)
+				}
 			}
 
-			// TODO: error handling
-			if emailErr != nil || webhookErr != nil {
-				logs.errors.Println(emailErr)
-				logs.errors.Println(webhookErr)
-			}
+			// TODO: smart error handling
 		}
 	}
 	poller.abortChan <- true
