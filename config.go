@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -49,7 +48,6 @@ func (cfg *config) fromFlags() {
 }
 func (cfg *config) fromEnv() {
 	for _, e := range os.Environ() {
-		fmt.Println(e)
 		pair := strings.Split(e, "=")
 
 		if len(pair) > 1 {

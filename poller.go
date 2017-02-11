@@ -25,16 +25,22 @@ func (poller *poller) poll() {
 	for hash, request := range req.pendingRequests {
 		req.mutex.Unlock()
 
-		// TODO: get info from tss API
-		isNowComplete := false
-
-		if isNowComplete {
+		switch request.status {
+		case STATUS_NEW:
+			go request.process()
+		case STATUS_PENDING:
+			// Do nothing for now
+			// TODO: get info from tss API in separate request here
+			break
+		case STATUS_CONFIRMED:
 			req.mutex.Lock()
 			delete(req.pendingRequests, hash)
 			req.mutex.Unlock()
 			// TODO: update proof
 			request.proof = []byte{}
 			poller.notifyChan <- request
+			break
+			break
 		}
 		req.mutex.Lock()
 	}
