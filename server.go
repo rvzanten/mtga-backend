@@ -28,15 +28,16 @@ func main() {
 	cfg.fromEnv()
 	cfg.fromFlags() // flags overwrite environment vars
 
-	requestr := requester{
+	_requester := requester{
 		pendingRequests: make(map[string]*request),
 		mutex:           &sync.Mutex{},
 	}
+	_notifier := notifier{}
 
 	// functions to start grpc server with
 	rfunc := func(server *grpc.Server) {
 		OTSthingy.RegisterTimestampServer(server, timestampServer{
-			requestr: &requestr,
+			requestr: &_requester,
 		})
 	}
 	restfunc := func(ctx context.Context, mux *runtime.ServeMux, opts []grpc.DialOption) error {
@@ -55,7 +56,8 @@ func main() {
 		interval:   100, // ms
 		abortChan:  abortChan,
 		notifyChan: notifyChan,
-		requestr:   &requestr,
+		_requester: &_requester,
+		_notifier:  &_notifier,
 	}
 
 	for i := 0; i < cfg.notifiers; i++ {

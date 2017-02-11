@@ -8,8 +8,8 @@ import (
 )
 
 type request struct {
-	incompleteTS []byte
-	tsRequest    *OTSthingy.TimeStampRequest
+	proof     []byte
+	tsRequest *OTSthingy.TimeStampRequest
 }
 type requester struct {
 	pendingRequests map[string]*request
@@ -29,8 +29,8 @@ func (r *requester) addRequest(tsReq *OTSthingy.TimeStampRequest) error {
 
 	r.mutex.Lock()
 	r.pendingRequests[string(tsReq.DocumentHash)] = &request{
-		incompleteTS: []byte{},
-		tsRequest:    tsReq,
+		proof:     []byte{},
+		tsRequest: tsReq,
 	}
 	r.mutex.Unlock()
 	return nil
