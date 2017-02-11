@@ -1,0 +1,77 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "proto/OTSthingy.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/1/withcallback": {
+      "post": {
+        "operationId": "WithCallback",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/IncompleteTimeStamp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TimeStampRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Timestamp"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "IncompleteTimeStamp": {
+      "type": "object",
+      "properties": {
+        "ots": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "TimeStampRequest": {
+      "type": "object",
+      "properties": {
+        "document_hash": {
+          "type": "string",
+          "format": "byte"
+        },
+        "webhook_url": {
+          "type": "string",
+          "format": "string"
+        },
+        "email_address": {
+          "type": "string",
+          "format": "string"
+        },
+        "label": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    }
+  }
+}

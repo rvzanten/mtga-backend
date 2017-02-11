@@ -1,0 +1,30 @@
+/**
+ * This document contains information about calls to the OTSThingy.
+ * OTSThingy may be used as a convenient way to put proof of data
+ * on the Bitcoin blockchain.
+ */
+
+syntax="proto3";
+
+import "google/api/annotations.proto";
+
+
+service Timestamp {
+  rpc WithCallback (TimeStampRequest) returns (IncompleteTimeStamp) {
+    option (google.api.http) = {
+      post: "/1/withcallback"
+      body: "*"
+    };
+  }
+}
+
+message TimeStampRequest {
+  bytes document_hash =1;
+  string webhook_url =2;
+  string email_address =3;
+  string label=4;
+}
+
+message IncompleteTimeStamp {
+  bytes ots =1;
+}
