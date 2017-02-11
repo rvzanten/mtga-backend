@@ -13,7 +13,9 @@
 
 ## OTSthingy.proto
 
-
+This document contains information about calls to the OTSThingy.
+OTSThingy may be used as a convenient way to put proof of data
+on the Bitcoin blockchain.
 
 <a name="IncompleteTimeStamp"/>
 ### IncompleteTimeStamp
@@ -33,6 +35,7 @@
 | document_hash | [bytes](#bytes) | optional |  |
 | webhook_url | [string](#string) | optional |  |
 | email_address | [string](#string) | optional |  |
+| label | [string](#string) | optional |  |
 
 
 

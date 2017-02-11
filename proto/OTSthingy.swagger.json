@@ -66,6 +66,10 @@
         "email_address": {
           "type": "string",
           "format": "string"
+        },
+        "label": {
+          "type": "string",
+          "format": "string"
         }
       }
     }
