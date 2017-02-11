@@ -36,7 +36,6 @@ func (poller *poller) poll() {
 			req.mutex.Lock()
 			delete(req.pendingRequests, hash)
 			req.mutex.Unlock()
-			// TODO: update proof
 			poller.notifyChan <- request
 			break
 		}
@@ -66,8 +65,6 @@ func (poller *poller) notify() {
 					logs.errors.Println(webhookErr)
 				}
 			}
-
-			// TODO: smart error handling
 		}
 	}
 	poller.abortChan <- true
