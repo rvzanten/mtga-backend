@@ -23,25 +23,28 @@ var poller *types.Poller
 // as well as a poller routine that checks if timestamp requests have been finalized
 func main() {
 	initVars()
-	_requester := types.Requester{
+	requester := types.Requester{
 		PendingRequests: make(map[string]*types.Request),
 		Mutex:           &sync.Mutex{},
 	}
-	_notifier := types.Notifier{}
+	notifier := types.Notifier{}
 	abortChan := make(chan bool, 5)
 	notifyChan := make(chan *types.Request, 5)
 
-	startPoller(&_requester, &_notifier, abortChan, notifyChan)
-	startGRPC(&_requester)
+	startPoller(&requester, &notifier, abortChan, notifyChan)
+	startGRPC(&requester)
 
+	catchSignal()
+	exit(abortChan, notifyChan)
+}
+
+func catchSignal() {
 	// wait for OS signal to shut down properly
 	interuptChan := make(chan os.Signal)
 	signal.Notify(interuptChan, os.Interrupt)
 	s := <-interuptChan
 	logs.Debug.Println("Got signal:", s)
-	exit(abortChan, notifyChan)
 }
-
 func exit(abortChan chan bool, notifyChan chan *types.Request) {
 	poller.Abort = true
 	logs.Debug.Println("Waiting for poller and notifiers to finish...")
