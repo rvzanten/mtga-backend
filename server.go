@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"os"
 	"os/signal"
 	"sync"
@@ -15,8 +14,8 @@ import (
 )
 
 var abort bool
-var requestr requester
 var logs logger
+var cfg *config
 
 // our main func starts the GRPC API and REST grpc-gateway
 // as well as a poller routine that checks if timestamp requests have been finalized
@@ -25,43 +24,41 @@ func main() {
 	// init stuff.
 	logs = logger{}
 	logs.init(os.Stdout, os.Stdout, os.Stderr, os.Stdout)
-	var (
-		grpcBind  = flag.String("grpcBind", ":8181", "Expose storeapi GRPC on this port")
-		restBind  = flag.String("restBind", ":8080", "Expose storeapi REST api on this port")
-		tssURL    = flag.String("tssURL", "", "The API URL of the timestamp server")
-		notifiers = flag.Int("notifiers", 5, "Amount of notifier routines to run")
-	)
-	flag.Parse()
-	requestr = requester{
-		url:             *tssURL,
+	cfg = &config{}
+	cfg.fromEnv()
+	cfg.fromFlags() // flags overwrite environment vars
+
+	requestr := requester{
 		pendingRequests: make(map[string]*request),
 		mutex:           &sync.Mutex{},
 	}
 
 	// functions to start grpc server with
 	rfunc := func(server *grpc.Server) {
-		OTSthingy.RegisterTimestampServer(server, timestampServer{})
+		OTSthingy.RegisterTimestampServer(server, timestampServer{
+			requestr: &requestr,
+		})
 	}
 	restfunc := func(ctx context.Context, mux *runtime.ServeMux, opts []grpc.DialOption) error {
-		return OTSthingy.RegisterTimestampHandlerFromEndpoint(ctx, mux, *grpcBind, opts)
+		return OTSthingy.RegisterTimestampHandlerFromEndpoint(ctx, mux, cfg.grpcBind, opts)
 	}
 
 	// start grpc and rest API
-	go serveGRPC(*grpcBind, rfunc)
-	go serveREST(*restBind, restfunc, "api/api.swagger.json")
+	go serveGRPC(cfg.grpcBind, rfunc)
+	go serveREST(cfg.restBind, restfunc, "api/api.swagger.json")
 
 	// start poller.
 	abortChan := make(chan bool, 5)
 	notifyChan := make(chan *request, 5)
 
 	poller := poller{
-		url:        *tssURL,
-		interval:   100,
+		interval:   100, // ms
 		abortChan:  abortChan,
 		notifyChan: notifyChan,
+		requestr:   &requestr,
 	}
 
-	for i := 0; i < *notifiers; i++ {
+	for i := 0; i < cfg.notifiers; i++ {
 		go poller.notify()
 	}
 	go poller.start()
@@ -78,11 +75,11 @@ func main() {
 	_ = <-abortChan // abort ack from poller
 
 	// Send abort signal to notifiers
-	for i := 0; i < *notifiers; i++ {
+	for i := 0; i < cfg.notifiers; i++ {
 		notifyChan <- nil
 	}
 	// Abort ack from notifiers
-	for i := 0; i < *notifiers; i++ {
+	for i := 0; i < cfg.notifiers; i++ {
 		_ = <-abortChan
 	}
 	logs.debug.Println("Done")

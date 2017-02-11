@@ -22,6 +22,7 @@ message TimeStampRequest {
   bytes document_hash =1;
   string webhook_url =2;
   string email_address =3;
+  string label=4;
 }
 
 message IncompleteTimeStamp {

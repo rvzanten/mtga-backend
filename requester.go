@@ -3,23 +3,23 @@ package main
 import (
 	"errors"
 	"sync"
+
+	"gitlab.com/joukehofman/OTSthingy/proto"
 )
 
 type request struct {
 	incompleteTS []byte
-	webhook      string
-	email        string
+	tsRequest    *OTSthingy.TimeStampRequest
 }
 type requester struct {
-	url             string
 	pendingRequests map[string]*request
 	mutex           *sync.Mutex
 }
 
-func (r *requester) addRequest(hash []byte, webhook string, email string) error {
+func (r *requester) addRequest(tsReq *OTSthingy.TimeStampRequest) error {
 
 	r.mutex.Lock()
-	if _, exists := r.pendingRequests[string(hash)]; exists {
+	if _, exists := r.pendingRequests[string(tsReq.DocumentHash)]; exists {
 		r.mutex.Unlock()
 		return errors.New("Request already exists")
 	}
@@ -28,10 +28,9 @@ func (r *requester) addRequest(hash []byte, webhook string, email string) error 
 	// TODO: push request to API
 
 	r.mutex.Lock()
-	r.pendingRequests[string(hash)] = &request{
+	r.pendingRequests[string(tsReq.DocumentHash)] = &request{
 		incompleteTS: []byte{},
-		webhook:      webhook,
-		email:        email,
+		tsRequest:    tsReq,
 	}
 	r.mutex.Unlock()
 	return nil

@@ -11,6 +11,7 @@ import (
 )
 
 type timestampServer struct {
+	requestr *requester
 }
 
 func (s timestampServer) WithCallback(ctx context.Context, tsReq *OTSthingy.TimeStampRequest) (*OTSthingy.IncompleteTimeStamp, error) {
@@ -33,6 +34,6 @@ func (s timestampServer) WithCallback(ctx context.Context, tsReq *OTSthingy.Time
 	}
 
 	result := OTSthingy.IncompleteTimeStamp{}
-	requestr.addRequest(tsReq.DocumentHash, tsReq.WebhookUrl, tsReq.EmailAddress)
+	s.requestr.addRequest(tsReq)
 	return &result, nil
 }
