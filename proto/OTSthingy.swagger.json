@@ -59,15 +59,15 @@
           "type": "string",
           "format": "byte"
         },
-        "webhook_url": {
-          "type": "string",
-          "format": "string"
-        },
         "email_address": {
           "type": "string",
           "format": "string"
         },
         "label": {
+          "type": "string",
+          "format": "string"
+        },
+        "webhook_url": {
           "type": "string",
           "format": "string"
         }
