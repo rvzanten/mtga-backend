@@ -31,7 +31,6 @@ func (poller *poller) poll() {
 			break
 		case STATUS_PENDING:
 			// Do nothing for now
-			// TODO: get info from tss API in separate request here
 			break
 		case STATUS_CONFIRMED:
 			req.mutex.Lock()
