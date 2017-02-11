@@ -28,6 +28,7 @@ func (poller *poller) poll() {
 		switch request.status {
 		case STATUS_NEW:
 			go request.process()
+			break
 		case STATUS_PENDING:
 			// Do nothing for now
 			// TODO: get info from tss API in separate request here
@@ -37,9 +38,7 @@ func (poller *poller) poll() {
 			delete(req.pendingRequests, hash)
 			req.mutex.Unlock()
 			// TODO: update proof
-			request.proof = []byte{}
 			poller.notifyChan <- request
-			break
 			break
 		}
 		req.mutex.Lock()
@@ -50,6 +49,7 @@ func (poller *poller) poll() {
 func (poller *poller) notify() {
 	for !abort {
 		req := <-poller.notifyChan
+		logs.debug.Println("Got request from chan")
 		if req != nil {
 			var emailErr, webhookErr error
 
@@ -63,8 +63,9 @@ func (poller *poller) notify() {
 			}
 
 			// TODO: error handling
-			if emailErr != nil && webhookErr != nil {
-				// readd to queue?
+			if emailErr != nil || webhookErr != nil {
+				logs.errors.Println(emailErr)
+				logs.errors.Println(webhookErr)
 			}
 		}
 	}

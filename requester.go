@@ -50,7 +50,7 @@ func (r *request) process() {
 
 	// TODO call to timestamp server script
 	// exec('script', r.tsRequest.DocumentHash)
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 5)
 	r.proof = []byte("Dit is het bewijs")
 	r.status = STATUS_CONFIRMED
 }
