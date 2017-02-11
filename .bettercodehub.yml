@@ -1,0 +1,5 @@
+exclude:
+- /proto/.*
+component_depth: 1
+languages:
+- go
