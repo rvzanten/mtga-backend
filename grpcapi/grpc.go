@@ -21,6 +21,8 @@ import (
 type server struct {
 }
 
+var grpcInitialized, restInitialized bool
+
 // Regfunc is a function to register custom server with
 type regfunc func(server *grpc.Server)
 
@@ -35,6 +37,7 @@ func ServeGRPC(bind string, registerFunc regfunc) {
 
 	registerFunc(s)
 
+	grpcInitialized = true
 	s.Serve(lis)
 }
 
@@ -62,8 +65,13 @@ func ServeREST(bind string, registerFunc regfuncREST, swaggerLocation string) {
 	panicErr(err)
 	mux.Handle("/", gwmux)
 
+	restInitialized = true
 	http.ListenAndServe(bind, allowCORS(mux))
 	panicErr(err)
+}
+
+func isInitialized() bool {
+	return grpcInitialized && restInitialized
 }
 
 // TODO: Netjes maken dit

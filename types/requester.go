@@ -52,6 +52,10 @@ func (r *Requester) AddRequest(tsReq *OTSthingy.TimeStampRequest) error {
 	return nil
 }
 
+func (r *Requester) GetRequestCount() int {
+	return len(r.PendingRequests)
+}
+
 func (r *Request) process() {
 	r.status = STATUS_PENDING
 	docHex := hex.EncodeToString(r.tsRequest.DocumentHash)

@@ -8,7 +8,7 @@ import (
 
 func TestInitVars(t *testing.T) {
 	initVars()
-	if logs == nil {
+	if logs == nil || cfg == nil {
 		t.Fail()
 	}
 }
